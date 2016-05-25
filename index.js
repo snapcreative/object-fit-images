@@ -1,7 +1,9 @@
 'use strict';
 var ಠ = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='; // transparent image, used as accessor and replacing image
+var ಠಠ = ಠ + ಠ; // additional permanent settings accessor
 var propRegex = /(object-fit|object-position)\s*:\s*([-\w\s%]+)/g;
 var supportsObjectFit = 'object-fit' in document.documentElement.style;
+var supportsObjectPosition = 'object-position' in document.documentElement.style;
 var nativeGetAttribute = document.documentElement.getAttribute;
 var nativeSetAttribute = document.documentElement.setAttribute;
 var autoModeEnabled = false;
@@ -19,12 +21,31 @@ function getStyle(el) {
 function fixOne(el, requestedSrc) {
 	var style = getStyle(el);
 
-	// exit if not set
-	// `fill` is the default behavior for <img>
-	// Absolutely no work necessary,
-	// unless it was already "fixed" at one point
-	if (!style['object-fit'] || style['object-fit'] === 'fill' && !el[ಠ]) {
-		return;
+	// If the fix was already applied, don't try to skip fixing,
+	// - because once you go ofi you never go back.
+	// - Wait, that doesn't rhyme.
+	// - This ain't rap, bro.
+	if (!el[ಠ]) {
+		if (
+			!style['object-fit'] || // if image doesn't use object-fit
+			style['object-fit'] === 'fill' // fill is the default behavior
+		) {
+			return;
+		}
+
+		// Where object-fit is supported and object-position+srcset+currentSrc isn't,
+		// apply the fix unless the user prefers otherwise (because it would break srcset support)
+		if (
+			!style['object-position'] || // if object-position is not used
+
+			!el[ಠಠ].skipTest && // unless user wants to apply regardless of browser support
+			supportsObjectFit && // if browser already supports object-fit
+			el.srcset && // if image has srcset
+			typeof el.currentSrc === 'undefined' && // if currentSrc is not supported
+			el[ಠಠ].preferSrcsetOverPosition // if user prefers srcset over positioning
+		) {
+			return;
+		}
 	}
 
 	// Edge 12 supports srcset but not currentSrc
@@ -111,7 +132,7 @@ function onInsert(e) {
 }
 
 function hijackAttributes() {
-	if (!supportsObjectFit) {
+	if (supportsObjectPosition) {
 		HTMLImageElement.prototype.getAttribute = function (name) {
 			if (this[ಠ] && name === 'src') {
 				return this[ಠ].a;
@@ -133,7 +154,7 @@ export default function fix(imgs, opts) {
 	var startAutoMode = !autoModeEnabled && !imgs;
 	opts = opts || {};
 	imgs = imgs || 'img';
-	if (supportsObjectFit && !opts.skipTest) {
+	if (supportsObjectPosition && !opts.skipTest) {
 		return false;
 	}
 
@@ -146,6 +167,7 @@ export default function fix(imgs, opts) {
 
 	// apply fix to all
 	for (var i = 0; i < imgs.length; i++) {
+		imgs[i][ಠಠ] = opts;
 		fixOne(imgs[i]);
 	}
 
@@ -163,5 +185,6 @@ export default function fix(imgs, opts) {
 }
 
 fix.supportsObjectFit = supportsObjectFit;
+fix.supportsObjectPosition = supportsObjectPosition;
 
 hijackAttributes();
