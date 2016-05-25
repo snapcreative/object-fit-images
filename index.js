@@ -21,8 +21,9 @@ function fixOne(el, requestedSrc) {
 
 	// exit if not set
 	// `fill` is the default behavior for <img>
-	// Absolutely no work necessary
-	if (!style['object-fit'] || style['object-fit'] === 'fill') {
+	// Absolutely no work necessary,
+	// unless it was already "fixed" at one point
+	if (!style['object-fit'] || style['object-fit'] === 'fill' && !el[ಠ]) {
 		return;
 	}
 
@@ -81,7 +82,7 @@ function fixOne(el, requestedSrc) {
 			setTimeout(loop, 100);
 		})();
 	} else {
-		el.style.backgroundSize = style['object-fit'].replace('none', 'auto');
+		el.style.backgroundSize = style['object-fit'].replace('none', 'auto').replace('fill', '100% 100%');
 	}
 }
 
