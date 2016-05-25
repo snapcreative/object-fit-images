@@ -1,7 +1,7 @@
 {
   "name": "object-fit-images",
   "version": "2.4.2",
-  "description": "Adds support to object-fit to images on IE9, IE10, IE11, Edge and other old browsers.",
+  "description": "Polyfill object-fit and object-position on images on IE9, IE10, IE11, Edge, Safari, ...",
   "license": "MIT",
   "repository": "bfred-it/object-fit-images",
   "author": "Federico Brigante <bfred-it@users.noreply.github.com> (twitter.com/bfred_it)",
@@ -10,6 +10,7 @@
   },
   "homepage": "https://github.com/bfred-it/object-fit-images#readme",
   "keywords": [
+    "polyfill",
     "object-fit",
     "covers",
     "contains",
@@ -18,7 +19,6 @@
     "internet",
     "explorer",
     "ies",
-    "polyfill",
     "shim",
     "shiv",
     "fills",

@@ -1,10 +1,12 @@
 # object-fit-images
 
-> Adds support to `object-fit` to images on IE9, IE10, IE11, Edge and other old browsers.
+> Polyfill `object-fit` and `object-position` on images on IE9, IE10, IE11, Edge, Safari, ...
 
 [![gzipped size](https://badges.herokuapp.com/size/github/bfred-it/object-fit-images/gh-pages/dist/ofi.browser.js?gzip=true&label=gzipped%20size)](#readme) [![Travis build status](https://api.travis-ci.org/bfred-it/object-fit-images.svg?branch=gh-pages)](https://travis-ci.org/bfred-it/object-fit-images) [![npm version](https://img.shields.io/npm/v/object-fit-images.svg)](https://www.npmjs.com/package/object-fit-images) 
 
-This script only applies to images where necessary. Take a look at the [demo.](http://bfred-it.github.io/object-fit-images/demo/) 
+This adds support of `object-fit` and `object-position` to **IEdge 9-13, Android 4.4-, Safari (OSX 9.1-, iOS 9.3-)** and skips browsers that already support them.
+
+Take a look at the [demo.](http://bfred-it.github.io/object-fit-images/demo/) 
 
 ## Main features
 
@@ -20,17 +22,17 @@ This script only applies to images where necessary. Take a look at the [demo.](h
 
 |                                 | object-fit-images                                              | [tonipinel/object-fit-polyfill](https://github.com/tonipinel/object-fit-polyfill)           | [jonathantneal/fitie](https://github.com/jonathantneal/fitie)
 :---                              | :---                                                           | :---                                                                                        | :---
-Browsers                          | IEdge 9-14, Android 4.4.4-, ...                    | "All browsers"                                                                              | IE 8-11, Edge
+Browsers                          | IEdge 9-14, Android < 5, Safari < 10                    | "All browsers"                                                                              | IE 8-11, Edge
 Tags                              | `img`                                                          | `img`                                                                                       | `img`, `video`
 `cover/contain`                   | 💚                                                              | 💚                                                                                           | 💚
 `fill`                            | 💚                                                              | 💚                                                                                           | 💚
 `none`                            | 💚                                                              | 💚                                                                                           | 💔
-`scale-down`                      | 💚 [more info](https://github.com/bfred-it/object-fit-images/commit/6170255cc6ebcaebf560e695fc63354ca150f315) | 💔                                                                                           | 💔
+`scale-down`                      | 💚 [`{watchMQ:true}`](#media-query-affects-object-fit-value) suggested | 💔                                                                                           | 💔
 `object-position`                 | 💚                                                              | 💔                                                                                           | 💔
-`srcset` support                  | 💚 Native or [picturefill](https://github.com/scottjehl/picturefill), but [see notes](detailed-support-tables.md#object-fit-images--srcset)                                                              | 💔                                                                                           | 💔
-`picture` support                 | 💛 Exclusively where [picturefill](https://github.com/scottjehl/picturefill) [acts*](detailed-support-tables.md#object-fit-images--picture) | 💔                                                                                           | 💔
+`srcset` support                  | 💚 Native or [picturefill](https://github.com/scottjehl/picturefill), but [see notes](detailed-support-tables.md)                                                               | 💔                                                                                           | 💔
+`picture` support                 | 💛 Exclusively where picturefill [acts*](detailed-support-tables.md#object-fit-images--picture) | 💔                                                                                           | 💔
 
-Performance and ease of use considerations in [detailed-support-tables.md](detailed-support-tables.md#additional-comparisons-with-alternatives)
+Performance and ease of use considerations in [extended-comparison.md](extended-comparison.md)
 
 ## Usage
 
@@ -123,7 +125,11 @@ objectFitImages();
 parameter                         | description
 :---                              | :---
 **`images`**                      | Type: `string` (as a selector) or `array`-like *optional* <br> The images to apply the fix on. If it's not supplied (or `false`), OFI will enter the automatic mode (which means that new images in the DOM will automatically be fixed).
-**`opts`**                        | Type: `object` *optional* <br> Set to `{watchMQ: true}` if you expect `object-fit` to vary in a media query.
+**`opts`**                        | Type: `object` *optional* <br> Set to `{watchMQ: true}` if you expect `object-fit` to vary in a media query or if you use `scale-down` <br> Set to `{preferSrcsetOverPosition: true}` if you want to change [the behavior in Safari](detailed-support-tables.md#object-fit-images--srcset--object-position--safari-84-)
+
+## Known issues
+
+Take a look at [possible issues and limitations](detailed-support-tables.md#notes-about-specific-combinations) of object-fit-images.
 
 ## License
 
