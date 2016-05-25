@@ -87,18 +87,18 @@ function fixOne(el, requestedSrc) {
 }
 
 function keepSrcUsable(el) {
-	var definitions = {
+	var descriptors = {
 		get: function () {
 			return el[ಠ].s;
 		},
-		set: function (v) {
+		set: function (src) {
 			delete el[ಠ].i; // scale-down's img sizes need to be updated too
-			fixOne(el, v);
-			return v;
+			fixOne(el, src);
+			return src;
 		}
 	};
-	Object.defineProperty(el, 'src', definitions);
-	Object.defineProperty(el, 'currentSrc', {get: definitions.get}); // it should be read-only
+	Object.defineProperty(el, 'src', descriptors);
+	Object.defineProperty(el, 'currentSrc', {get: descriptors.get}); // it should be read-only
 }
 
 function watchMQ(imgs, opts) {
