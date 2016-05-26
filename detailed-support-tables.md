@@ -4,25 +4,20 @@
 
 ## Notes about specific combinations
 
-### *object-fit-images* + [*picturefill*](https://github.com/scottjehl/picturefill)
+### *object-fit-images* + `srcset`
 
-💛 If you need `srcset`/`picture`, load/execute *picturefill* **after** OFI, or else images with `srcset` will be blank (happens in Edge 12+)
+💚 You'll need to load [*picturefill*](https://github.com/scottjehl/picturefill) in this order:
 
-### *object-fit-images* + `srcset` + Edge 12
+0. Load _object-fit-images.js_
+1. Load _picturefill.js_
+2. Call `imageFitImages(...)`
 
-💔 `srcset` is discarded and `src` is used in Edge 12 because [it doesn't support `currentSrc`.](https://blogs.windows.com/msedgedev/2015/06/08/introducing-srcset-responsive-images-in-microsoft-edge/)
+This will keep these combinations working correctly:
 
-### *object-fit-images* + `srcset` + `object-position` + Safari 8.x
+* `srcset` + Edge 12
+* `srcset` + `object-position` + Safari 8.x
 
-💛 `srcset` is discarded and `src` is used in Safari 8.x when used in combination with `object-position` because it doesn't support `currentSrc`.
-
-To discard `object-position` instead, use the option `preferSrcsetOverPosition`, example:
-
-```js
-objectFitImages('img', {
-	preferSrcsetOverPosition: true
-});
-```
+Otherwise `srcset` will be discarded in bothboth cases.
 
 ### *object-fit-images* + `picture`
 
