@@ -2,10 +2,12 @@
 var ಠ = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='; // transparent image, used as accessor and replacing image
 var ಠಠ = ಠ + ಠ; // additional permanent settings accessor
 var propRegex = /(object-fit|object-position)\s*:\s*([-\w\s%]+)/g;
-var supportsObjectFit = 'object-fit' in document.documentElement.style;
-var supportsObjectPosition = 'object-position' in document.documentElement.style;
-var nativeGetAttribute = document.documentElement.getAttribute;
-var nativeSetAttribute = document.documentElement.setAttribute;
+var testImg = new Image();
+var supportsObjectFit = 'object-fit' in testImg.style;
+var supportsObjectPosition = 'object-position' in testImg.style;
+var supportsCurrentSrc = typeof testImg.currentSrc === 'string';
+var nativeGetAttribute = testImg.getAttribute;
+var nativeSetAttribute = testImg.setAttribute;
 var autoModeEnabled = false;
 
 function getStyle(el) {
@@ -19,13 +21,16 @@ function getStyle(el) {
 }
 
 function fixOne(el, requestedSrc) {
+	if (el[ಠಠ].parsingSrcset) {
+		return;
+	}
 	var style = getStyle(el);
 
 	// If the fix was already applied, don't try to skip fixing,
 	// - because once you go ofi you never go back.
 	// - Wait, that doesn't rhyme.
 	// - This ain't rap, bro.
-	if (!el[ಠ]) {
+	if (!el[ಠ] && !el[ಠಠ].skipTest) {
 		if (
 			!style['object-fit'] || // if image doesn't use object-fit
 			style['object-fit'] === 'fill' // fill is the default behavior
@@ -33,28 +38,41 @@ function fixOne(el, requestedSrc) {
 			return;
 		}
 
-		// Where object-fit is supported and object-position+srcset+currentSrc isn't,
-		// apply the fix unless the user prefers otherwise (because it would break srcset support)
+		// Where object-fit is supported and object-position isn't (Safari < 10)
 		if (
-			!style['object-position'] || // if object-position is not used
-
-			!el[ಠಠ].skipTest && // unless user wants to apply regardless of browser support
 			supportsObjectFit && // if browser already supports object-fit
-			el.srcset && // if image has srcset
-			typeof el.currentSrc === 'undefined' && // if currentSrc is not supported
-			el[ಠಠ].preferSrcsetOverPosition // if user prefers srcset over positioning
+			!style['object-position'] // unless object-position is used
 		) {
 			return;
 		}
 	}
 
-	// Edge 12 supports srcset but not currentSrc
-	// https://github.com/bfred-it/object-fit-images/blob/gh-pages/detailed-support-tables.md#object-fit-images--srcset
-	var src = requestedSrc || el.currentSrc || el.src;
+	var src = el.currentSrc || el.src;
 
-	// remove srcset because it overrides src
-	if (el.srcset) {
-		el.srcset = '';
+	if (requestedSrc) {
+		// explicitly requested src takes precedence
+		src = requestedSrc;
+	} else if (el.srcset && !supportsCurrentSrc && window.picturefill) {
+		// prevent infinite loop
+		// fillImg sets the src which in turn calls fixOne
+		el[ಠಠ].parsingSrcset = true;
+
+		// parse srcset with picturefill where currentSrc isn't available
+		if (!el[window.picturefill._.ns] || !el[window.picturefill._.ns].evaled) {
+			// force synchronous srcset parsing
+			window.picturefill._.fillImg(el, {reselect: true});
+		}
+
+		var imageData = el[window.picturefill._.ns];
+		if (!imageData.curSrc) {
+			// force picturefill to parse srcset
+			imageData.supported = false;
+			window.picturefill._.fillImg(el, {reselect: true});
+		}
+		delete el[ಠಠ].parsingSrcset;
+
+		// retrieve parsed currentSrc, if any
+		src = imageData.curSrc || src;
 	}
 
 	// store info on object for later use
@@ -63,14 +81,26 @@ function fixOne(el, requestedSrc) {
 		if (requestedSrc) {
 			// the attribute reflects the user input
 			// the property is the resolved URL
-			el[ಠ].a = requestedSrc;
+			el[ಠ].srcAttr = requestedSrc;
 		}
 	} else {
 		el[ಠ] = {
 			s: src,
-			a: requestedSrc || nativeGetAttribute.call(el, 'src')
+			srcAttr: requestedSrc || nativeGetAttribute.call(el, 'src'),
+			srcsetAttr: el.srcset
 		};
 		el.src = ಠ;
+
+		// remove srcset because it overrides src
+		if (el.srcset) {
+			el.srcset = '';
+
+			// restore non-working srcset property
+			Object.defineProperty(el, 'srcset', {
+				value: el[ಠ].srcsetAttr
+			});
+		}
+
 		keepSrcUsable(el);
 	}
 
@@ -132,17 +162,17 @@ function onInsert(e) {
 }
 
 function hijackAttributes() {
-	if (supportsObjectPosition) {
+	if (!supportsObjectPosition) {
 		HTMLImageElement.prototype.getAttribute = function (name) {
-			if (this[ಠ] && name === 'src') {
-				return this[ಠ].a;
+			if (this[ಠ] && (name === 'src' || name === 'srcset')) {
+				return this[ಠ][name + 'Attr'];
 			}
 			return nativeGetAttribute.call(this, name);
 		};
 
 		HTMLImageElement.prototype.setAttribute = function (name, value) {
-			if (this[ಠ] && name === 'src') {
-				this.src = String(value);
+			if (this[ಠ] && (name === 'src' || name === 'srcset')) {
+				this[name === 'src' ? 'src' : name + 'Attr'] = String(value);
 			} else {
 				nativeSetAttribute.call(this, name, value);
 			}
