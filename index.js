@@ -51,28 +51,29 @@ function fixOne(el, requestedSrc) {
 
 	if (requestedSrc) {
 		// explicitly requested src takes precedence
+		// TODO: this still should overwrite srcset
 		src = requestedSrc;
 	} else if (el.srcset && !supportsCurrentSrc && window.picturefill) {
+		var pf = window.picturefill._.ns;
 		// prevent infinite loop
 		// fillImg sets the src which in turn calls fixOne
 		el[ಠಠ].parsingSrcset = true;
 
 		// parse srcset with picturefill where currentSrc isn't available
-		if (!el[window.picturefill._.ns] || !el[window.picturefill._.ns].evaled) {
+		if (!el[pf] || !el[pf].evaled) {
 			// force synchronous srcset parsing
 			window.picturefill._.fillImg(el, {reselect: true});
 		}
 
-		var imageData = el[window.picturefill._.ns];
-		if (!imageData.curSrc) {
+		if (!el[pf].curSrc) {
 			// force picturefill to parse srcset
-			imageData.supported = false;
+			el[pf].supported = false;
 			window.picturefill._.fillImg(el, {reselect: true});
 		}
 		delete el[ಠಠ].parsingSrcset;
 
 		// retrieve parsed currentSrc, if any
-		src = imageData.curSrc || src;
+		src = el[pf].curSrc || src;
 	}
 
 	// store info on object for later use
@@ -95,7 +96,7 @@ function fixOne(el, requestedSrc) {
 		if (el.srcset) {
 			el.srcset = '';
 
-			// restore non-working srcset property
+			// restore non-browser-readable srcset property
 			Object.defineProperty(el, 'srcset', {
 				value: el[ಠ].srcsetAttr
 			});
