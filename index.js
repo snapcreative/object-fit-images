@@ -153,15 +153,6 @@ function keepSrcUsable(el) {
 	Object.defineProperty(el, 'currentSrc', {get: descriptors.get}); // it should be read-only
 }
 
-function watchMQ(imgs, opts) {
-	window.addEventListener('resize', fix.bind(null, imgs, opts));
-}
-function onInsert(e) {
-	if (e.target.tagName === 'IMG') {
-		fixOne(e.target);
-	}
-}
-
 function hijackAttributes() {
 	if (!supportsObjectPosition) {
 		HTMLImageElement.prototype.getAttribute = function (name) {
@@ -203,15 +194,22 @@ export default function fix(imgs, opts) {
 	}
 
 	if (startAutoMode) {
-		document.body.addEventListener('load', onInsert, true);
+		document.body.addEventListener('load', function (e) {
+			if (e.target.tagName === 'IMG') {
+				fix(e.target, {
+					skipTest: opts.skipTest
+				});
+			}
+		}, true);
 		autoModeEnabled = true;
 		imgs = 'img'; // reset to a generic selector for watchMQ
 	}
 
 	// if requested, watch media queries for object-fit change
 	if (opts.watchMQ) {
-		delete opts.watchMQ;
-		watchMQ(imgs, opts);
+		window.addEventListener('resize', fix.bind(null, imgs, {
+			skipTest: opts.skipTest
+		}));
 	}
 }
 
