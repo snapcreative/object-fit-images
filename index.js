@@ -25,21 +25,21 @@ function fixOne(el, requestedSrc) {
 		return;
 	}
 	var style = getStyle(el);
+	style['object-fit'] = style['object-fit'] || 'fill'; // default value
 
 	// If the fix was already applied, don't try to skip fixing,
 	// - because once you go ofi you never go back.
 	// - Wait, that doesn't rhyme.
 	// - This ain't rap, bro.
-	if (!el[ಠ] && !el[ಠಠ].skipTest) {
-		if (
-			!style['object-fit'] || // if image doesn't use object-fit
-			style['object-fit'] === 'fill' // fill is the default behavior
-		) {
+	if (!el[ಠ]) {
+		// fill is the default behavior so no action is necessary
+		if (style['object-fit'] === 'fill') {
 			return;
 		}
 
 		// Where object-fit is supported and object-position isn't (Safari < 10)
 		if (
+			!el[ಠಠ].skipTest && // unless user wants to apply regardless of browser support
 			supportsObjectFit && // if browser already supports object-fit
 			!style['object-position'] // unless object-position is used
 		) {
