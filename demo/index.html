@@ -96,7 +96,7 @@
 
 	function addImage(btn) {
 		var div = document.createElement('figure');
-		var ofit = ['contain', 'cover', 'none', 'scale-down'][Math.random() * 4 | 0];
+		var ofit = ['fill', 'contain', 'cover', 'none', 'scaleDown'][Math.random() * 4 | 0];
 		div.innerHTML = '<img class="OF-' + ofit + '" src="https://goo.gl/DvBM70"><figcaption>new image with <code>' + ofit + '</code></figcaption>';
 		btn.parentNode.parentNode.appendChild(div);
 	}
