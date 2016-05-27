@@ -1,6 +1,5 @@
 'use strict';
 var ಠ = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='; // transparent image, used as accessor and replacing image
-var ಠಠ = ಠ + ಠ; // additional permanent settings accessor
 var propRegex = /(object-fit|object-position)\s*:\s*([-\w\s%]+)/g;
 var testImg = new Image();
 var supportsObjectFit = 'object-fit' in testImg.style;
@@ -21,7 +20,7 @@ function getStyle(el) {
 }
 
 function fixOne(el, requestedSrc) {
-	if (el[ಠಠ].parsingSrcset) {
+	if (el[ಠ].parsingSrcset) {
 		return;
 	}
 	var style = getStyle(el);
@@ -31,7 +30,7 @@ function fixOne(el, requestedSrc) {
 	// - because once you go ofi you never go back.
 	// - Wait, that doesn't rhyme.
 	// - This ain't rap, bro.
-	if (!el[ಠ]) {
+	if (!el[ಠ].s) {
 		// fill is the default behavior so no action is necessary
 		if (style['object-fit'] === 'fill') {
 			return;
@@ -39,7 +38,7 @@ function fixOne(el, requestedSrc) {
 
 		// Where object-fit is supported and object-position isn't (Safari < 10)
 		if (
-			!el[ಠಠ].skipTest && // unless user wants to apply regardless of browser support
+			!el[ಠ].skipTest && // unless user wants to apply regardless of browser support
 			supportsObjectFit && // if browser already supports object-fit
 			!style['object-position'] // unless object-position is used
 		) {
@@ -57,7 +56,7 @@ function fixOne(el, requestedSrc) {
 		var pf = window.picturefill._.ns;
 		// prevent infinite loop
 		// fillImg sets the src which in turn calls fixOne
-		el[ಠಠ].parsingSrcset = true;
+		el[ಠ].parsingSrcset = true;
 
 		// parse srcset with picturefill where currentSrc isn't available
 		if (!el[pf] || !el[pf].evaled) {
@@ -70,14 +69,14 @@ function fixOne(el, requestedSrc) {
 			el[pf].supported = false;
 			window.picturefill._.fillImg(el, {reselect: true});
 		}
-		delete el[ಠಠ].parsingSrcset;
+		delete el[ಠ].parsingSrcset;
 
 		// retrieve parsed currentSrc, if any
 		src = el[pf].curSrc || src;
 	}
 
 	// store info on object for later use
-	if (el[ಠ]) {
+	if (el[ಠ].s) {
 		el[ಠ].s = src;
 		if (requestedSrc) {
 			// the attribute reflects the user input
@@ -189,7 +188,7 @@ export default function fix(imgs, opts) {
 
 	// apply fix to all
 	for (var i = 0; i < imgs.length; i++) {
-		imgs[i][ಠಠ] = opts;
+		imgs[i][ಠ] = imgs[i][ಠ] || opts;
 		fixOne(imgs[i]);
 	}
 
