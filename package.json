@@ -27,6 +27,7 @@
     "backgrounds"
   ],
   "files": [
+    "dist/ofi.browser.js",
     "dist/ofi.common-js.js",
     "dist/ofi.es-modules.js"
   ],
