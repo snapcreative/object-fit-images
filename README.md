@@ -4,7 +4,7 @@
 
 [![gzipped size](https://badges.herokuapp.com/size/github/bfred-it/object-fit-images/gh-pages/dist/ofi.browser.js?gzip=true&label=gzipped%20size)](#readme) [![Travis build status](https://api.travis-ci.org/bfred-it/object-fit-images.svg?branch=gh-pages)](https://travis-ci.org/bfred-it/object-fit-images) [![npm version](https://img.shields.io/npm/v/object-fit-images.svg)](https://www.npmjs.com/package/object-fit-images) 
 
-This adds support of `object-fit` and `object-position` to **IEdge 9-13, Android 4.4-, Safari (OSX 9.1-, iOS 9.3-)** and skips browsers that already support them.
+This adds support for `object-fit` and `object-position` to **IEdge 9-13, Android 4.4-, Safari (OSX 9.1-, iOS 9.3-)** and skips browsers that already support them.
 
 Take a look at the [demo.](http://bfred-it.github.io/object-fit-images/demo/) 
 
@@ -27,7 +27,7 @@ Tags                              | `img`                                       
 `cover/contain`                   | 💚                                                              | 💚                                                                                           | 💚
 `fill`                            | 💚                                                              | 💚                                                                                           | 💚
 `none`                            | 💚                                                              | 💚                                                                                           | 💔
-`scale-down`                      | 💚 [`{watchMQ:true}`](#media-query-affects-object-fit-value) suggested | 💔                                                                                           | 💔
+`scale-down`                      | 💚 [`{watchMQ:true}`](#apply-on-resize) suggested | 💔                                                                                           | 💔
 `object-position`                 | 💚                                                              | 💔                                                                                           | 💔
 `srcset` support                  | 💚 Native or [picturefill](https://github.com/scottjehl/picturefill), but [see notes](detailed-support-tables.md)                                                               | 💔                                                                                           | 💔
 `picture` support                 | 💛 Exclusively where picturefill [acts*](detailed-support-tables.md#object-fit-images--picture) | 💔                                                                                           | 💔
@@ -36,78 +36,88 @@ Performance and ease of use considerations in [extended-comparison.md](extended-
 
 ## Usage
 
-Because it's nearly impossible to read unsupported properties, `object-fit-images` reads the value of `object-fit` and `object-position` from the `font-family` property on `img`.
+You will need 3 things
 
-```css
-.your-favorite-image {
-	object-fit: contain;
-	font-family: 'object-fit: contain;'
-}
-.your-second-favorite {
-	object-fit: contain;
-	object-position: bottom;
-	font-family: 'object-fit: cover; object-position: bottom'
-}
-```
+0. one or more `<img>` elements with `src` or `srcset`  
 
-This has no effect on the rendering because it's ignored by the browser.
+	```html
+	<img class='your-favorite-image' src='image.jpg'>
+	```
+	
+0. CSS defining `object-fit` and a special `font-family` property to allow IE to read the correct value
 
-The `font-family` property could be generated automatically with the [**PostCSS plugin**](https://github.com/ronik-design/postcss-object-fit-images) or with the **SCSS/SASS/Less** mixins in the [`preprocessor`](/preprocessors) folder.
+	```css
+	.your-favorite-image {
+		object-fit: contain;
+		font-family: 'object-fit: contain;'
+	}
+	```
+	
+	or, if you also need `object-position`
+	
+	```css
+	.your-favorite-image {
+		object-fit: cover;
+		object-position: bottom;
+		font-family: 'object-fit: cover; object-position: bottom;'
+	}
+	```
+	
+	To generate the `font-family` automatically, you can use the [PostCSS plugin](https://github.com/ronik-design/postcss-object-fit-images) or the [SCSS/SASS/Less mixins.](/preprocessors)
 
-### JS
+0. the activation call before `</body>`, on _on DOM ready_
 
-Fix all the images on the page, present and future (auto mode)
+	```js
+	objectFitImages();
+	// if you use jQuery, the code is: $(function () { objectFitImages() });
+	```
+	
+	This will fix all the images on the page **and** also all the images added later (auto mode).
+	
+	Alternatively, only fix the images you want, once:
+	
+	```js
+	// pass a selector
+	objectFitImages('img.some-image');
+	```
+	
+	```js
+	// an array/NodeList
+	var someImages = document.querySelectorAll('img.some-image');
+	objectFitImages(someImages);
+	```
+	
+	```js
+	// a single element
+	var oneImage = document.querySelector('img.some-image');
+	objectFitImages(oneImage);
+	```
+	
+	```js
+	// or with jQuery
+	$('img.some-image').get().forEach(objectFitImages);
+	```
 
-```js
-objectFitImages();
-// but you should still run it on DOM ready or at the bottom of the page
-// if you use jQuery, the code is: $(objectFitImages);
-```
+## Apply on `resize`
 
-Alternatively, just fix them once. The first parameter can be:
+You don't need to re-apply it on `resize`, unless:
 
-```js
-// a selector
-objectFitImages('img.some-image');
+* You're using `scale-down`, or
+* <a id="media-query-affects-object-fit-value">your media queries change the value of `object-fit`,</a> like this
 
-// an array/NodeList
-var someImages = document.querySelectorAll('img.some-image');
-objectFitImages(someImages);
+	```css
+	                            img { object-fit: cover }
+	@media (max-width: 500px) { img { object-fit: contain } }
+	```
 
-// a single element
-var oneImage = document.querySelector('img.some-image');
-objectFitImages(oneImage);
-
-// or with jQuery
-$('img.some-image').get().forEach(objectFitImages);
-```
-
-You can run `objectFitImages()` on the same elements more than once without issues (for example if you decide to change anything on resize)
-
-#### Media query affects object-fit value
-
-If your media queries change the value of `object-fit`, like this:
-
-```css
-                            img { object-fit: cover }
-@media (max-width: 500px) { img { object-fit: contain } }
-```
-
-... then you need to enable the media queries support like this:
+In one of those cases, use the `watchMQ` option:
 
 ```js
 objectFitImages('img.some-image', {watchMQ: true});
-// or objectFitImages(false, {watchMQ: true}); // for the auto mode
+// or objectFitImages(null, {watchMQ: true}); // for the auto mode
 ```
 
-## Load and enable with plain HTML
-
-```html
-<script src="dist/ofi.browser.js"></script>
-<script>objectFitImages();</script>
-```
-
-## Load with with browserify
+## Install
 
 ```sh
 npm install --save object-fit-images
@@ -115,21 +125,60 @@ npm install --save object-fit-images
 
 ```js
 var objectFitImages = require('object-fit-images');
-objectFitImages();
+```
+
+If you don't use browserify/webpack, include this instead:
+
+```html
+<script src="dist/ofi.browser.js"></script>
 ```
 
 ## API
 
-### `objectFitImages([images, [opts]])`
+### `objectFitImages([images, [options]])`
 
-parameter                         | description
-:---                              | :---
-**`images`**                      | Type: `string` (as a selector) or `array`-like *optional* <br> The images to apply the fix on. If it's not supplied (or `false`), OFI will enter the automatic mode (which means that new images in the DOM will automatically be fixed).
-**`opts`**                        | Type: `object` *optional* <br> Set to `{watchMQ: true}` if you expect `object-fit` to vary in a media query or if you use `scale-down` <br> Set to `{preferSrcsetOverPosition: true}` if you want to change [the behavior in Safari](detailed-support-tables.md#object-fit-images--srcset--object-position--safari-84-)
+<table>
+    <tr>
+        <th>parameter</th>
+        <th>description</th>
+    </tr>
+    <tr>
+        <th><code>images</code></th>
+        <td>
+            Type: <code>string</code>, <code>element</code>, <code>array</code>, <code>NodeList</code>, <code>null</code><br>
+            Default: <code>null</code><br><br>
 
-## Known issues
+            The images to fix. More info in the <a href="#usage">Usage</a> section 
 
-Take a look at [possible issues and limitations](detailed-support-tables.md#notes-about-specific-combinations) of object-fit-images.
+        </td>
+    </tr>
+    <tr>
+        <th><code>options</code></th>
+        <td>
+            
+            Type: <code>object</code><br>
+            Default: <code>{}</code><br>
+            Example: <code>{watchMQ:true}</code><br><br>
+            
+            <table>
+                <tr>
+                    <th><code>watchMQ</code></th>
+                    <td>
+                        Type: <code>boolean</code><br>
+                        Default: <code>false</code>
+
+                        This enables the automatic re-fix of the selected images when the window resizes. You only need it <a href="#apply-on-resize">in some cases</a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+## Notes and known issues
+
+* You can run `objectFitImages()` on the same elements more than once without issues (for example if you decide to change anything on resize)
+* Take a look at [possible issues and limitations](detailed-support-tables.md#notes-about-specific-combinations) of object-fit-images.
 
 ## License
 
