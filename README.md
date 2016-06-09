@@ -95,7 +95,8 @@ You will need 3 things
 	
 	```js
 	// or with jQuery
-	$('img.some-image').get().forEach(objectFitImages);
+	var $someImages = $('img.some-image');
+	objectFitImages($someImages);
 	```
 
 ## Apply on `resize`
