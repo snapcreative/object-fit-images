@@ -22,7 +22,7 @@ Take a look at the [demo.](http://bfred-it.github.io/object-fit-images/demo/)
 
 |                                 | object-fit-images                                              | [tonipinel/object-fit-polyfill](https://github.com/tonipinel/object-fit-polyfill)           | [jonathantneal/fitie](https://github.com/jonathantneal/fitie)
 :---                              | :---                                                           | :---                                                                                        | :---
-Browsers                          | IEdge 9-14, Android < 5, Safari < 10                    | "All browsers"                                                                              | IE 8-11, Edge
+Browsers                          | IEdge 9-14, Android < 5, Safari < 10                    | "All browsers"                                                                              | IE 8-11
 Tags                              | `img`                                                          | `img`                                                                                       | `img`, `video`
 `cover/contain`                   | 💚                                                              | 💚                                                                                           | 💚
 `fill`                            | 💚                                                              | 💚                                                                                           | 💚
