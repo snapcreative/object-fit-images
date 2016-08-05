@@ -51,8 +51,12 @@
     "xo": "^0.16.0"
   },
   "xo": {
+    "esnext": true,
     "env": [
       "browser"
-    ]
+    ],
+    "rules": {
+      "prefer-template": 0
+    }
   }
 }

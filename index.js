@@ -1,18 +1,18 @@
 'use strict';
-var ಠ = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='; // transparent image, used as accessor and replacing image
-var propRegex = /(object-fit|object-position)\s*:\s*([-\w\s%]+)/g;
-var testImg = new Image();
-var supportsObjectFit = 'object-fit' in testImg.style;
-var supportsObjectPosition = 'object-position' in testImg.style;
-var supportsCurrentSrc = typeof testImg.currentSrc === 'string';
-var nativeGetAttribute = testImg.getAttribute;
-var nativeSetAttribute = testImg.setAttribute;
-var autoModeEnabled = false;
+const ಠ = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='; // transparent image, used as accessor and replacing image
+const propRegex = /(object-fit|object-position)\s*:\s*([-\w\s%]+)/g;
+const testImg = new Image();
+const supportsObjectFit = 'object-fit' in testImg.style;
+const supportsObjectPosition = 'object-position' in testImg.style;
+const supportsCurrentSrc = typeof testImg.currentSrc === 'string';
+const nativeGetAttribute = testImg.getAttribute;
+const nativeSetAttribute = testImg.setAttribute;
+let autoModeEnabled = false;
 
 function getStyle(el) {
-	var style = getComputedStyle(el).fontFamily;
-	var parsed;
-	var props = {};
+	const style = getComputedStyle(el).fontFamily;
+	let parsed;
+	const props = {};
 	while ((parsed = propRegex.exec(style)) !== null) {
 		props[parsed[1]] = parsed[2];
 	}
@@ -23,7 +23,7 @@ function fixOne(el, requestedSrc) {
 	if (el[ಠ].parsingSrcset) {
 		return;
 	}
-	var style = getStyle(el);
+	const style = getStyle(el);
 	style['object-fit'] = style['object-fit'] || 'fill'; // default value
 
 	// If the fix was already applied, don't try to skip fixing,
@@ -46,14 +46,14 @@ function fixOne(el, requestedSrc) {
 		}
 	}
 
-	var src = el.currentSrc || el.src;
+	let src = el.currentSrc || el.src;
 
 	if (requestedSrc) {
 		// explicitly requested src takes precedence
 		// TODO: this still should overwrite srcset
 		src = requestedSrc;
 	} else if (el.srcset && !supportsCurrentSrc && window.picturefill) {
-		var pf = window.picturefill._.ns;
+		const pf = window.picturefill._.ns;
 		// prevent infinite loop
 		// fillImg sets the src which in turn calls fixOne
 		el[ಠ].parsingSrcset = true;
@@ -140,11 +140,11 @@ function fixOne(el, requestedSrc) {
 }
 
 function keepSrcUsable(el) {
-	var descriptors = {
-		get: function () {
+	const descriptors = {
+		get() {
 			return el[ಠ].s;
 		},
-		set: function (src) {
+		set(src) {
 			delete el[ಠ].i; // scale-down's img sizes need to be updated too
 			fixOne(el, src);
 			return src;
@@ -156,14 +156,14 @@ function keepSrcUsable(el) {
 
 function hijackAttributes() {
 	if (!supportsObjectPosition) {
-		HTMLImageElement.prototype.getAttribute = function (name) {
+		HTMLImageElement.prototype.getAttribute = name => {
 			if (this[ಠ] && (name === 'src' || name === 'srcset')) {
 				return this[ಠ][name + 'Attr'];
 			}
 			return nativeGetAttribute.call(this, name);
 		};
 
-		HTMLImageElement.prototype.setAttribute = function (name, value) {
+		HTMLImageElement.prototype.setAttribute = (name, value) => {
 			if (this[ಠ] && (name === 'src' || name === 'srcset')) {
 				this[name === 'src' ? 'src' : name + 'Attr'] = String(value);
 			} else {
@@ -174,7 +174,7 @@ function hijackAttributes() {
 }
 
 export default function fix(imgs, opts) {
-	var startAutoMode = !autoModeEnabled && !imgs;
+	const startAutoMode = !autoModeEnabled && !imgs;
 	opts = opts || {};
 	imgs = imgs || 'img';
 	if (supportsObjectPosition && !opts.skipTest) {
@@ -189,13 +189,13 @@ export default function fix(imgs, opts) {
 	}
 
 	// apply fix to all
-	for (var i = 0; i < imgs.length; i++) {
+	for (let i = 0; i < imgs.length; i++) {
 		imgs[i][ಠ] = imgs[i][ಠ] || opts;
 		fixOne(imgs[i]);
 	}
 
 	if (startAutoMode) {
-		document.body.addEventListener('load', function (e) {
+		document.body.addEventListener('load', e => {
 			if (e.target.tagName === 'IMG') {
 				fix(e.target, {
 					skipTest: opts.skipTest
