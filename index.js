@@ -156,14 +156,14 @@ function keepSrcUsable(el) {
 
 function hijackAttributes() {
 	if (!supportsObjectPosition) {
-		HTMLImageElement.prototype.getAttribute = name => {
+		HTMLImageElement.prototype.getAttribute = function (name) {
 			if (this[ಠ] && (name === 'src' || name === 'srcset')) {
 				return this[ಠ][name + 'Attr'];
 			}
 			return nativeGetAttribute.call(this, name);
 		};
 
-		HTMLImageElement.prototype.setAttribute = (name, value) => {
+		HTMLImageElement.prototype.setAttribute = function (name, value) {
 			if (this[ಠ] && (name === 'src' || name === 'srcset')) {
 				this[name === 'src' ? 'src' : name + 'Attr'] = String(value);
 			} else {
