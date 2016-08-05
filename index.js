@@ -46,7 +46,7 @@ function fixOne(el, requestedSrc) {
 		}
 	}
 
-	let src = el.currentSrc || el.src;
+	let src = el[ಠ].ios7src || el.currentSrc || el.src;
 
 	if (requestedSrc) {
 		// explicitly requested src takes precedence
@@ -103,7 +103,9 @@ function fixOne(el, requestedSrc) {
 			}
 
 			keepSrcUsable(el);
-		} catch (err) {/**/}
+		} catch (err) {
+			el[ಠ].ios7src = src;
+		}
 	}
 
 	el.style.backgroundImage = 'url("' + src + '")';
