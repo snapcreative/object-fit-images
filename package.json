@@ -35,23 +35,20 @@
   "jsnext:main": "dist/ofi.es-modules.js",
   "scripts": {
     "build:js": "bfred-npm-bundler ofi objectFitImages",
-    "build:size": "gzip-size dist/ofi.browser.js",
     "build": "npm-run-all --silent jsfix build:*",
     "jsfix": "xo --fix",
     "watch:server": "browser-sync start --startPath demo --no-ghost-mode --reload-delay 300 --server --files 'dist/*.browser.js,demo/**'",
     "watch:build": "onchange 'index.js' --initial -- npm run build -- --continue-on-error",
     "watch": "npm-run-all --parallel --silent watch:*",
-    "prepublish": "xo; npm run build",
+    "prepublish": "npm run build",
     "test": "xo; npm run build"
   },
   "devDependencies": {
-    "bfred-npm-bundler": "^5.1.0",
-    "browser-sync": "^2.12.5",
-    "gzip-size-cli": "^1.0.0",
-    "npm-run-all": "^1.8.0",
-    "onchange": "^2.4.0",
-    "uglify-js": "^2.6.2",
-    "xo": "^0.14.0"
+    "bfred-npm-bundler": "^7.1.2",
+    "browser-sync": "^2.11.2",
+    "npm-run-all": "^2.3.0",
+    "onchange": "^2.2.0",
+    "xo": "^0.16.0"
   },
   "xo": {
     "env": [
