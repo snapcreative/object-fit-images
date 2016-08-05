@@ -91,17 +91,19 @@ function fixOne(el, requestedSrc) {
 		};
 		el.src = ಠ;
 
-		// remove srcset because it overrides src
-		if (el.srcset) {
-			el.srcset = '';
+		try {
+			// remove srcset because it overrides src
+			if (el.srcset) {
+				el.srcset = '';
 
-			// restore non-browser-readable srcset property
-			Object.defineProperty(el, 'srcset', {
-				value: el[ಠ].srcsetAttr
-			});
-		}
+				// restore non-browser-readable srcset property
+				Object.defineProperty(el, 'srcset', {
+					value: el[ಠ].srcsetAttr
+				});
+			}
 
-		keepSrcUsable(el);
+			keepSrcUsable(el);
+		} catch (err) {/**/}
 	}
 
 	el.style.backgroundImage = 'url("' + src + '")';
